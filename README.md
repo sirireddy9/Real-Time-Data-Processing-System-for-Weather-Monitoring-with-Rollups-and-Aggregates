@@ -4,10 +4,15 @@ This project is a real-time data processing system designed to monitor weather c
 ## Key Features:
 
 **Real-Time Data Retrieval:** Continuously fetch weather data for metros like Delhi, Mumbai, Chennai, Bangalore, Kolkata, and Hyderabad.
+
 **Daily Weather Summaries:** Calculate daily aggregates including average, maximum, minimum temperatures, and dominant weather conditions.
+
 **Alert System:** Configure thresholds for weather conditions (e.g., temperature exceeding 35°C) and trigger alerts if conditions are met.
+
 **Temperature Conversion:** Supports converting temperatures from Kelvin to Celsius or Fahrenheit based on user preference.
+
 **Visualizations:** Display daily summaries, historical weather trends, and triggered alerts.
+
 **Additional Features:**
 
 Extend support for extra weather parameters like humidity and wind speed.
