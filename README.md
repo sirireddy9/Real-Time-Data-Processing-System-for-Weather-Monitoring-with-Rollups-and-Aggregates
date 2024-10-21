@@ -1,7 +1,7 @@
 # Real-Time-Data-Processing-System-for-Weather-Monitoring-with-Rollups-and-Aggregates
 This project is a real-time data processing system designed to monitor weather conditions in major metros in India using the OpenWeatherMap API. It retrieves weather data such as temperature, feels-like temperature, and main weather conditions at configurable intervals.
 
-Key Features:
+## Key Features:
 
 Real-Time Data Retrieval: Continuously fetch weather data for metros like Delhi, Mumbai, Chennai, Bangalore, Kolkata, and Hyderabad.
 Daily Weather Summaries: Calculate daily aggregates including average, maximum, minimum temperatures, and dominant weather conditions.
