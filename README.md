@@ -1,190 +1,290 @@
 
+
 # Real-Time Data Processing System for Weather Monitoring with Rollups and Aggregates
 
 ## Overview
-The Real-Time Data Processing System for Weather Monitoring is an application designed to monitor weather conditions in real-time using the OpenWeatherMap API. This system continuously fetches weather data for selected metros in India, processes it, and provides summarized insights using rollups and aggregates. The project also includes alerting based on user-defined thresholds and visualizations of weather trends over time.
+
+This project is designed to create a **Real-Time Weather Monitoring System** by fetching live weather data from the OpenWeatherMap API, processing it, and storing key weather insights. The system performs rollups, aggregations, and weather alerting based on customizable thresholds. The project includes various functionalities such as data fetching, temperature conversion, storing weather summaries in a database, and visualizing historical weather trends.
+
+Below is a step-by-step guide to help you set up and run this system smoothly, including real-time data visualizations and weather alerts. Throughout this guide, I’ve included images of real-time outputs to make the process clear and easy to follow.
+
+---
 
 ## Key Features
-- Fetches real-time weather data from the OpenWeatherMap API for multiple cities.
-- Performs temperature conversions based on user preferences (Celsius, Fahrenheit, Kelvin).
-- Calculates daily weather summaries including average, maximum, minimum temperatures, and dominant weather conditions.
-- Implements threshold-based alerting and provides email or console notifications.
-- Stores daily weather summaries in a SQLite database.
-- Visualizes historical weather data trends using Matplotlib.
+
+- Fetches weather data for multiple cities in India.
+- Converts temperatures between Kelvin, Celsius, and Fahrenheit.
+- Stores daily weather summaries in a database.
+- Triggers alerts if certain weather thresholds are breached.
+- Visualizes temperature trends and alerts.
+
+---
 
 ## Table of Contents
-1. [Technologies Used](#technologies-used)
-2. [Installation Procedure](#installation-procedure)
-3. [Solution](#solution)
-   - [API Connection](#api-connection)
-   - [Fetch Weather Data](#fetch-weather-data)
-   - [Temperature Conversion](#temperature-conversion)
-   - [Store Weather Data](#store-weather-data)
-   - [Weather Alerts](#weather-alerts)
-   - [Visualization of Data](#visualization-of-data)
-4. [Testing Installed Libraries](#testing-installed-libraries)
+
+- [Technologies Used](#technologies-used)
+- [Installation](#installation)
+- [Solution](#solution)
+  - [API Connection](#api-connection)
+  - [Fetch Weather Data](#fetch-weather-data)
+  - [Store Weather Data](#store-weather-data)
+  - [Temperature Conversion](#temperature-conversion)
+  - [Weather Alerts](#weather-alerts)
+  - [Visualization of Data](#visualization-of-data)
+- [Testing](#testing)
+- [Images](#images)
+
+---
 
 ## Technologies Used
-- **Python 3.8+**
-- **Requests Library** for making API calls: `pip install requests`
-- **Dotenv Library** for managing environment variables: `pip install python-dotenv`
-- **SQLite3** for storing daily weather summaries: Included with Python
-- **SQLAlchemy** for ORM (Optional for advanced use): `pip install SQLAlchemy`
-- **Matplotlib** for visualizing data: `pip install matplotlib`
-- **OpenWeatherMap API**: Sign up at [OpenWeatherMap](https://openweathermap.org/) to get a free API key.
 
-## Installation Procedure
+- **Python 3.x**: The core programming language used.
+- **SQLite3**: Used for local database storage.
+- **SQLAlchemy**: ORM for handling database interactions.
+- **dotenv**: To securely manage API keys and environment variables.
+- **matplotlib**: For data visualization.
+- **OpenWeatherMap API**: Provides real-time weather data.
+
+---
+
+## Installation
+
+To run this application, follow the steps below:
 
 ### 1. Clone the Repository
+
 ```bash
-git clone https://github.com/your-repo-name/weather-monitoring.git
-cd weather-monitoring
+git clone https://github.com/yourusername/real-time-weather-monitoring.git
+cd real-time-weather-monitoring
 ```
 
-### 2. Install Required Dependencies
+### 2. Install Dependencies
+
 ```bash
 pip install -r requirements.txt
 ```
 
-### 3. Set Up API Key
-Create a `.env` file and add your OpenWeatherMap API key.
+This will install the required libraries, such as `requests`, `dotenv`, `matplotlib`, and others.
+
+### 3. Set Up Environment Variables
+
+Create a `.env` file to securely store your API key.
 
 ```bash
 touch .env
+```
+
+Now open the file and add your OpenWeatherMap API key:
+
+```bash
 nano .env
 ```
-Add the following line to the `.env` file:
-```bash
+
+Insert the following code:
+
+```
 OPENWEATHER_API_KEY=your_api_key_here
 ```
 
-### 4. Set Up SQLite Database
-```bash
-sqlite3 weather_data.db
-```
-Run the following SQL query to create the `daily_summary` table:
-```sql
-CREATE TABLE daily_summary (
-    city TEXT,
-    date TEXT,
-    avg_temp REAL,
-    max_temp REAL,
-    min_temp REAL,
-    dominant_weather TEXT
-);
-```
+Save and close the file.
 
-### 5. Running the Application
-To fetch and process weather data, run the following command:
-```bash
-python fetch_and_store_weather.py
-```
-
-### 6. Visualizing the Data
-To generate weather trend visualizations:
-```bash
-python weather_data_finall_visualization.py
-```
+---
 
 ## Solution
 
-### 1. API Connection
-The application fetches weather data from the OpenWeatherMap API using an API key stored in a `.env` file.
+### API Connection
+
+To fetch weather data, you first need to establish an API connection using the OpenWeatherMap API. In this step, we create a file called `.env` to store our API key securely.
 
 #### Steps:
-- Create a `.env` file:
-```bash
-touch .env
-nano .env
+1. Create a `.env` file:
+   ```bash
+   touch .env
+   ```
+2. Edit the file:
+   ```bash
+   nano .env
+   ```
+3. Insert the following API key (replace `your_api_key_here` with your actual key):
+   ```env
+   OPENWEATHER_API_KEY=your_api_key_here
+   ```
+
+#### Example Code:
+
+```python
+import os
+from dotenv import load_dotenv
+
+load_dotenv()  # Load environment variables
+api_key = os.getenv('OPENWEATHER_API_KEY')
+
+if api_key:
+    print("API key loaded successfully.")
+else:
+    print("Failed to load API key.")
 ```
 
-- Add the following content to the `.env` file:
-```bash
-OPENWEATHER_API_KEY=ba9b3009acc174dd0a81d9b2b230b46
-```
+---
 
-### 2. Fetch Weather Data
-The following code fetches weather data for cities using the OpenWeatherMap API.
+### Fetch Weather Data
+
+Fetching weather data is one of the core tasks of this project. We fetch data for multiple cities and print it in a readable format.
+
+#### Steps:
+1. Create a Python file for fetching data:
+   ```bash
+   nano fetch_weather_data.py
+   ```
+2. Add the following code to fetch data from the API for predefined cities:
 
 ```python
 import os
 import requests
 from dotenv import load_dotenv
 
-load_dotenv()  # Load environment variables from .env file
+load_dotenv()
 api_key = os.getenv('OPENWEATHER_API_KEY')
 
-def get_weather_data(city, api_key):
+def get_weather_data(city):
     url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}&units=metric"
     response = requests.get(url)
-    if response.status_code == 200:
-        return response.json()
-    else:
-        return None
+    return response.json() if response.status_code == 200 else None
 
 cities = ['Delhi', 'Mumbai', 'Chennai', 'Bangalore', 'Kolkata', 'Hyderabad']
 
 for city in cities:
-    data = get_weather_data(city, api_key)
+    data = get_weather_data(city)
     if data:
-        print(f"City: {city}, Temperature: {data['main']['temp']}°C, Weather: {data['weather'][0]['description']}")
+        print(f"City: {city}, Temp: {data['main']['temp']}°C, Weather: {data['weather'][0]['description']}")
     else:
-        print(f"Failed to retrieve data for {city}")
+        print(f"Failed to fetch data for {city}.")
 ```
 
-### 3. Temperature Conversion
-The code snippet below allows users to convert temperatures to Celsius or Fahrenheit.
+3. Run the script:
+   ```bash
+   python fetch_weather_data.py
+   ```
+
+#### Expected Output:
+Check the following image for expected output when the program fetches weather data.
+
+![Fetch Weather Data](Real-time-weather-Monitoring/Output-Images/Fetch-Weather-Data.png)
+
+---
+
+### Store Weather Data
+
+To persist weather data for further analysis, we store daily summaries in a SQLite database.
+
+#### Steps:
+1. Create a database for storing the data:
+   ```bash
+   sqlite3 weather_data.db
+   ```
+2. Create a Python file to handle the storage:
+   ```bash
+   nano store_weather_data.py
+   ```
+3. Add the following code:
 
 ```python
-def convert_temperature(temp_kelvin, unit):
-    if unit == 'C':
-        return temp_kelvin - 273.15
-    elif unit == 'F':
-        return (temp_kelvin - 273.15) * 9/5 + 32
-    else:
-        return temp_kelvin
+import sqlite3
 
-unit = input("Enter preferred temperature unit (C for Celsius, F for Fahrenheit): ").upper()
-
-for city in cities:
-    data = get_weather_data(city, api_key)
-    if data:
-        temp_kelvin = data['main']['temp']
-        temp_converted = convert_temperature(temp_kelvin, unit)
-        print(f"City: {city}, Temperature: {temp_converted:.2f}°{unit}")
-    else:
-        print(f"Failed to retrieve data for {city}")
-```
-
-### 4. Store Weather Data
-Store fetched weather data into a SQLite database.
-
-```python
 def store_daily_summary(city, avg_temp, max_temp, min_temp, weather_condition):
     conn = sqlite3.connect('weather_data.db')
     c = conn.cursor()
-    date = datetime.now().strftime("%Y-%m-%d")
+    c.execute('''CREATE TABLE IF NOT EXISTS daily_summary (
+                 city TEXT, date TEXT, avg_temp REAL, max_temp REAL, min_temp REAL, dominant_weather TEXT)''')
     c.execute('''INSERT INTO daily_summary (city, date, avg_temp, max_temp, min_temp, dominant_weather)
-                 VALUES (?, ?, ?, ?, ?, ?)''', 
-                 (city, date, avg_temp, max_temp, min_temp, weather_condition))
+                 VALUES (?, date('now'), ?, ?, ?, ?)''', 
+                 (city, avg_temp, max_temp, min_temp, weather_condition))
     conn.commit()
     conn.close()
 ```
 
-### 5. Weather Alerts
-Check if the temperature exceeds a user-defined threshold and trigger alerts.
+4. Run the script to store weather data:
+   ```bash
+   python store_weather_data.py
+   ```
+
+#### Expected Output:
+Weather data should now be stored in the database. Here’s an image showing the stored data.
+
+![Stored Weather Data](Real-time-weather-Monitoring/Output-Images/Stored-Weather-Data.png)
+
+---
+
+### Temperature Conversion
+
+The system allows users to convert temperature values based on their preference: Celsius, Fahrenheit, or Kelvin.
+
+#### Steps:
+1. Create a Python file for temperature conversion:
+   ```bash
+   nano convert_temperature.py
+   ```
+2. Add the following code:
+
+```python
+def convert_temperature(temp, unit):
+    if unit == 'C':
+        return temp - 273.15
+    elif unit == 'F':
+        return (temp - 273.15) * 9/5 + 32
+    return temp
+```
+
+3. Run the conversion:
+   ```bash
+   python convert_temperature.py
+   ```
+
+#### Expected Output:
+
+![Temperature Conversion](Real-time-weather-Monitoring/Output-Images/Temperature-Conversion.png)
+
+---
+
+### Weather Alerts
+
+Alerts are triggered if certain thresholds are exceeded, such as temperatures over 35°C.
+
+#### Steps:
+1. Create a Python file for weather alerts:
+   ```bash
+   nano weather_alerts.py
+   ```
+2. Add the following code:
 
 ```python
 def check_alerts(city, temp):
     threshold = 35
     if temp > threshold:
-        print(f"**ALERT**: {city} has exceeded the threshold temperature of {threshold}°C with {temp}°C!")
-    else:
-        print(f"No alerts for {city}. The current temperature is {temp}°C.")
+        print(f"**ALERT**: {city} exceeded {threshold}°C!")
 ```
 
-### 6. Visualization of Data
-Visualize the weather data stored in the SQLite database using Matplotlib.
+3. Run the alert script:
+   ```bash
+   python weather_alerts.py
+   ```
+
+#### Expected Output:
+
+![Weather Alerts](Real-time-weather-Monitoring/Output-Images/Weather-Alerts.png)
+
+---
+
+### Visualization of Data
+
+To make sense of the stored weather data, we use `matplotlib` to visualize temperature trends over time.
+
+#### Steps:
+1. Create a Python file for data visualization:
+   ```bash
+   nano plot_weather_data.py
+   ```
+2. Add the following code:
 
 ```python
 import matplotlib.pyplot as plt
@@ -193,36 +293,41 @@ import sqlite3
 def plot_temperature_trends():
     conn = sqlite3.connect('weather_data.db')
     c = conn.cursor()
+    c.execute('SELECT date, avg_temp FROM daily_summary')
+    data = c.fetchall()
 
-    cities = ['Delhi', 'Mumbai', 'Chennai', 'Bangalore', 'Kolkata', 'Hyderabad']
-    for city in cities:
-        c.execute('''SELECT date, avg_temp FROM daily_summary WHERE city = ?''', (city,))
-        results = c.fetchall()
+    dates = [row[0] for row in data]
+    temps = [row[1] for row in data]
 
-        dates = [row[0] for row in results]
-        temps = [row[1] for row in results]
-
-        plt.plot(dates, temps, label=city)
-
+    plt.plot(dates, temps)
     plt.title('Temperature Trends')
-    plt.xlabel('Date')
-    plt.ylabel('Temperature (°C)')
-    plt.legend()
     plt.show()
-
-plot_temperature_trends()
 ```
 
-## Testing Installed Libraries
-Verify the installed libraries using the following commands:
+3. Run the visualization:
+   ```bash
+   python plot_weather_data.py
+   ```
 
-```bash
-python --version
-pip show requests
-pip show python-dotenv
-pip show matplotlib
-```
+#### Expected Output:
+
+![Visualization of Data](Real-time-weather-Monitoring/Output-Images/Visualization-of-Data.png)
 
 ---
 
-This README file is structured to be comprehensive, covering all aspects of your project, including setup, solution breakdown, and testing procedures. You can easily copy and paste it into your GitHub repository!
+## Testing
+
+Testing each functionality is critical for ensuring proper system behavior. Below are a few key test cases:
+
+1. **API Connection**: Verify that the system connects to the OpenWeatherMap API using a valid API key.
+2. **Data Retrieval**: Simulate API calls and ensure correct parsing of the weather data.
+3. **Temperature Conversion**: Test the conversion of temperatures based on user preference (Celsius, Fahrenheit).
+4. **Weather Alerts**: Test if the system triggers alerts when temperature thresholds are breached.
+
+---
+
+## Images
+
+Below are the paths to images used in this README for output visualization:
+
+- Fetch Weather Data: `
